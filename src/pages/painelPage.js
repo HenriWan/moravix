@@ -20,6 +20,14 @@ export const painelPage = {
                     </div>
                 </button>
 
+                <button class="conversor-item" data-rota="/converter">
+                    <span>📷</span>
+                    <div>
+                        <strong>PDF para JPG</strong>
+                        <small>Transforme páginas de PDF em imagens JPG.</small>
+                    </div>
+                </button>
+
                 <button class="conversor-item" data-rota="/silhouette">
                     <span>✂️</span>
                     <div>
@@ -41,14 +49,6 @@ export const painelPage = {
                     <div>
                         <strong>PDF para Word</strong>
                         <small>Conversor de PDF para documento editável.</small>
-                    </div>
-                </button>
-
-                <button class="conversor-item" data-conversor-breve="pdf-imagem">
-                    <span>📷</span>
-                    <div>
-                        <strong>PDF para imagem</strong>
-                        <small>Transformar páginas de PDF em imagem.</small>
                     </div>
                 </button>
             </div>

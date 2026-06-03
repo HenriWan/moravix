@@ -3,6 +3,7 @@ import {
     converterImagemParaPdf,
     converterParaJpg,
     converterParaPng,
+    converterPdfParaJpg,
     nomeSemExtensao
 } from "../services/imageService.js";
 
@@ -14,7 +15,8 @@ import {
     setMensagem
 } from "../utils/ui.js";
 
-let arquivoSelecionado = null;
+let arquivoImagemSelecionado = null;
+let arquivoPdfSelecionado = null;
 
 export const converterPage = {
     render() {
@@ -28,8 +30,12 @@ export const converterPage = {
             <div class="bloco-conversor">
                 <h3>Imagem para PNG, JPG ou PDF</h3>
 
-                <label for="inputConversor">Escolher imagem</label>
-                <input id="inputConversor" type="file" accept="image/png,image/jpeg,image/jpg,image/webp">
+                <label for="inputConversorImagem">Escolher imagem</label>
+                <input 
+                    id="inputConversorImagem" 
+                    type="file" 
+                    accept="image/png,image/jpeg,image/jpg,image/webp"
+                >
 
                 <img id="previewConversor" class="preview escondido" alt="Prévia da imagem">
 
@@ -43,6 +49,25 @@ export const converterPage = {
 
                 <button id="btnPdf" class="botao botao-principal">
                     Baixar PDF
+                </button>
+            </div>
+
+            <div class="bloco-conversor">
+                <h3>PDF para JPG</h3>
+
+                <p class="texto-secundario">
+                    Transforme cada página do PDF em uma imagem JPG.
+                </p>
+
+                <label for="inputPdfParaJpg">Escolher PDF</label>
+                <input 
+                    id="inputPdfParaJpg" 
+                    type="file" 
+                    accept="application/pdf"
+                >
+
+                <button id="btnPdfParaJpg" class="botao botao-principal">
+                    Converter PDF para JPG
                 </button>
             </div>
 
@@ -60,18 +85,7 @@ export const converterPage = {
             <div class="bloco-conversor bloco-em-breve">
                 <h3>PDF para Word</h3>
                 <p class="texto-secundario">
-                    Em breve: transformar PDF em documento editável.
-                </p>
-
-                <button class="botao botao-secundario" data-em-breve>
-                    Selecionar PDF
-                </button>
-            </div>
-
-            <div class="bloco-conversor bloco-em-breve">
-                <h3>PDF para imagem</h3>
-                <p class="texto-secundario">
-                    Em breve: transformar páginas de PDF em PNG ou JPG.
+                    Em breve: transformar PDF em documento editável usando backend.
                 </p>
 
                 <button class="botao botao-secundario" data-em-breve>
@@ -96,39 +110,54 @@ export const converterPage = {
             assistente: true
         });
 
-        const input = document.getElementById("inputConversor");
+        const inputImagem = document.getElementById("inputConversorImagem");
         const preview = document.getElementById("previewConversor");
+        const inputPdf = document.getElementById("inputPdfParaJpg");
 
-        input.addEventListener("change", () => {
-            arquivoSelecionado = input.files[0];
+        inputImagem.addEventListener("change", () => {
+            arquivoImagemSelecionado = inputImagem.files[0];
 
-            if (!arquivoSelecionado) {
+            if (!arquivoImagemSelecionado) {
                 return;
             }
 
-            preview.src = URL.createObjectURL(arquivoSelecionado);
+            preview.src = URL.createObjectURL(arquivoImagemSelecionado);
             preview.classList.remove("escondido");
 
             setMensagem("msgConversor", "Imagem carregada.", "sucesso");
         });
 
+        inputPdf.addEventListener("change", () => {
+            arquivoPdfSelecionado = inputPdf.files[0];
+
+            if (!arquivoPdfSelecionado) {
+                return;
+            }
+
+            setMensagem("msgConversor", "PDF carregado.", "sucesso");
+        });
+
         document.getElementById("btnPng").addEventListener("click", async () => {
-            await converter("png");
+            await converterImagem("png");
         });
 
         document.getElementById("btnJpg").addEventListener("click", async () => {
-            await converter("jpg");
+            await converterImagem("jpg");
         });
 
         document.getElementById("btnPdf").addEventListener("click", async () => {
-            await converter("pdf");
+            await converterImagem("pdf");
+        });
+
+        document.getElementById("btnPdfParaJpg").addEventListener("click", async () => {
+            await converterPdfEmJpg();
         });
 
         document.querySelectorAll("[data-em-breve]").forEach((botao) => {
             botao.addEventListener("click", () => {
                 setMensagem(
                     "msgConversor",
-                    "Esse conversor será implementado na próxima fase com backend.",
+                    "Esse conversor será implementado na próxima fase com backend próprio.",
                     "alerta"
                 );
             });
@@ -136,8 +165,8 @@ export const converterPage = {
     }
 };
 
-async function converter(formato) {
-    if (!arquivoSelecionado) {
+async function converterImagem(formato) {
+    if (!arquivoImagemSelecionado) {
         setMensagem("msgConversor", "Escolha uma imagem primeiro.", "erro");
         return;
     }
@@ -148,30 +177,66 @@ async function converter(formato) {
         let blob;
 
         if (formato === "png") {
-            blob = await converterParaPng(arquivoSelecionado);
+            blob = await converterParaPng(arquivoImagemSelecionado);
         }
 
         if (formato === "jpg") {
-            blob = await converterParaJpg(arquivoSelecionado);
+            blob = await converterParaJpg(arquivoImagemSelecionado);
         }
 
         if (formato === "pdf") {
-            blob = await converterImagemParaPdf(arquivoSelecionado);
+            blob = await converterImagemParaPdf(arquivoImagemSelecionado);
         }
 
-        const nome = `moravix-${nomeSemExtensao(arquivoSelecionado.name)}.${formato}`;
+        const nome = `moravix-${nomeSemExtensao(arquivoImagemSelecionado.name)}.${formato}`;
 
         baixarBlob(blob, nome);
 
         await salvarArquivo({
             blob,
-            nomeOriginal: arquivoSelecionado.name,
-            formatoOrigem: arquivoSelecionado.type,
+            nomeOriginal: arquivoImagemSelecionado.name,
+            formatoOrigem: arquivoImagemSelecionado.type,
             formatoSaida: formato,
             categoria: "conversoes"
         });
 
         setMensagem("msgConversor", `${formato.toUpperCase()} baixado e salvo no histórico.`, "sucesso");
+    } catch (erro) {
+        setMensagem("msgConversor", erro.message, "erro");
+    }
+}
+
+async function converterPdfEmJpg() {
+    if (!arquivoPdfSelecionado) {
+        setMensagem("msgConversor", "Escolha um PDF primeiro.", "erro");
+        return;
+    }
+
+    try {
+        setMensagem("msgConversor", "Convertendo PDF para JPG. Aguarde...", "alerta");
+
+        const imagens = await converterPdfParaJpg(arquivoPdfSelecionado);
+        const nomeBase = nomeSemExtensao(arquivoPdfSelecionado.name);
+
+        for (const imagem of imagens) {
+            const nomeArquivo = `moravix-${nomeBase}-pagina-${imagem.pagina}.jpg`;
+
+            baixarBlob(imagem.blob, nomeArquivo);
+
+            await salvarArquivo({
+                blob: imagem.blob,
+                nomeOriginal: arquivoPdfSelecionado.name,
+                formatoOrigem: arquivoPdfSelecionado.type,
+                formatoSaida: "jpg",
+                categoria: "pdf-para-jpg"
+            });
+        }
+
+        setMensagem(
+            "msgConversor",
+            `PDF convertido com sucesso. ${imagens.length} página(s) foram baixadas em JPG e salvas no histórico.`,
+            "sucesso"
+        );
     } catch (erro) {
         setMensagem("msgConversor", erro.message, "erro");
     }

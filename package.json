@@ -11,7 +11,8 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "latest",
-    "jspdf": "latest"
+    "jspdf": "latest",
+    "pdfjs-dist": "^4.10.38"
   },
   "devDependencies": {
     "vite": "latest"

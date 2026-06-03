@@ -1,4 +1,8 @@
 import { jsPDF } from "jspdf";
+import * as pdfjsLib from "pdfjs-dist/legacy/build/pdf.mjs";
+import pdfWorker from "pdfjs-dist/legacy/build/pdf.worker.mjs?url";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = pdfWorker;
 
 export function baixarBlob(blob, nomeArquivo) {
     const url = URL.createObjectURL(blob);
@@ -6,7 +10,9 @@ export function baixarBlob(blob, nomeArquivo) {
 
     link.href = url;
     link.download = nomeArquivo;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 
     URL.revokeObjectURL(url);
 }
@@ -178,6 +184,48 @@ export async function gerarPdfDeDataUrl(dataUrl) {
     return pdf.output("blob");
 }
 
+export async function converterPdfParaJpg(file) {
+    const arrayBuffer = await file.arrayBuffer();
+
+    const pdf = await pdfjsLib.getDocument({
+        data: arrayBuffer
+    }).promise;
+
+    const imagens = [];
+
+    for (let numeroPagina = 1; numeroPagina <= pdf.numPages; numeroPagina++) {
+        const pagina = await pdf.getPage(numeroPagina);
+
+        const viewport = pagina.getViewport({
+            scale: 2
+        });
+
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+
+        canvas.width = Math.floor(viewport.width);
+        canvas.height = Math.floor(viewport.height);
+
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        await pagina.render({
+            canvasContext: ctx,
+            viewport
+        }).promise;
+
+        const blob = await canvasParaBlob(canvas, "image/jpeg", 0.92);
+
+        imagens.push({
+            blob,
+            pagina: numeroPagina,
+            totalPaginas: pdf.numPages
+        });
+    }
+
+    return imagens;
+}
+
 function limitar255(valor) {
     return Math.max(0, Math.min(255, valor));
 }
@@ -218,6 +266,20 @@ export async function prepararImagemSilhouette(file, modo) {
                 pixels[i] = 0;
                 pixels[i + 1] = 0;
                 pixels[i + 2] = 0;
+                pixels[i + 3] = 255;
+            } else {
+                pixels[i] = 255;
+                pixels[i + 1] = 255;
+                pixels[i + 2] = 255;
+                pixels[i + 3] = 0;
+            }
+        }
+
+        if (modo === "silhueta-vermelha") {
+            if (cinza < 215) {
+                pixels[i] = 239;
+                pixels[i + 1] = 68;
+                pixels[i + 2] = 68;
                 pixels[i + 3] = 255;
             } else {
                 pixels[i] = 255;
