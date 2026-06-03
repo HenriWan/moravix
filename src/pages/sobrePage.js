@@ -19,19 +19,19 @@ export const sobrePage = {
                 <h3>Objetivo</h3>
 
                 <p>
-                    Ajudar pessoas a converter imagens para PNG, JPG e PDF, além de preparar imagens em alto contraste, preto e branco, silhueta preta e fundo transparente.
+                    Ajudar pessoas a converter imagens para PNG, JPG e PDF, além de preparar imagens em alto contraste, preto e branco, silhueta preta, silhueta vermelha e fundo transparente.
                 </p>
             </div>
 
             <div class="bloco-conversor">
-                <h3>Preparação para Silhouette</h3>
+                <h3>Compatibilidade com Silhouette Studio</h3>
 
                 <p>
-                    O app permite preparar imagens para importar no Silhouette Studio e rastrear para uso em máquinas de corte.
+                    O app prepara imagens para importar no Silhouette Studio e usar a ferramenta de rastrear/traçar.
                 </p>
 
                 <p class="texto-secundario">
-                    PNG e JPG podem precisar de rastreio/trace dentro do Silhouette Studio para criar linhas de corte.
+                    PNG e JPG podem precisar de rastreio/trace dentro do Silhouette Studio para criar linhas de corte. SVG e DXF serão estudados para uma fase futura.
                 </p>
             </div>
 

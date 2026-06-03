@@ -23,8 +23,8 @@ export const painelPage = {
                 <button class="conversor-item" data-rota="/silhouette">
                     <span>✂️</span>
                     <div>
-                        <strong>Imagem para Silhouette</strong>
-                        <small>Prepare imagem para rastrear e usar em máquina de corte.</small>
+                        <strong>Imagem para Silhouette Studio</strong>
+                        <small>Prepare imagem para importar, rastrear e criar linha de corte no Silhouette Studio.</small>
                     </div>
                 </button>
 
